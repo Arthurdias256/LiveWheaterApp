@@ -1,7 +1,10 @@
+import WheatherApp from "./components/WheatherApp"
+
 function App() {
   return (
     <>
-      Hello World
+      <WheatherApp/>
+        
     </>
   )
 }
