@@ -8,6 +8,7 @@ const WheatherApp = () => {
 
     const [data, setData] = useState(null)
     const [location, setLocation] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const weatherImages = {
         sunny,
@@ -68,10 +69,11 @@ const WheatherApp = () => {
 
         try {
 
+            setLoading(true)
+
             const coordinates = await getCoordinates(normalizedCity)
 
             if (!coordinates) {
-                console.log('City not found')
                 return
             }
 
@@ -91,7 +93,13 @@ const WheatherApp = () => {
             })
 
         } catch (error) {
+
             console.error(error)
+
+        } finally {
+
+            setLoading(false)
+
         }
     }
 
@@ -225,72 +233,86 @@ const WheatherApp = () => {
 
                 </div>
 
-                <div className="weather">
+                {loading ? (
 
-                    <img
-                        src={weatherImage}
-                        alt={weatherInfo?.description || 'Weather'}
-                    />
-
-                    <div className="weather-type">
-                        {weatherInfo
-                            ? weatherInfo.description
-                            : '--'}
+                    <div className="loading">
+                        Loading...
                     </div>
 
-                    <div className="temp">
-                        {data
-                            ? `${Math.round(data.temperature)}°`
-                            : '--'}
-                    </div>
+                ) : (
 
-                </div>
+                    <>
 
-                <div className="weather-date">
+                        <div className="weather">
 
-                    <p>
-                        {data
-                            ? formatDate(data.time)
-                            : ''}
-                    </p>
+                            <img
+                                src={weatherImage}
+                                alt={weatherInfo?.description || 'Weather'}
+                            />
 
-                </div>
+                            <div className="weather-type">
+                                {weatherInfo
+                                    ? weatherInfo.description
+                                    : '--'}
+                            </div>
 
-                <div className="weather-data">
+                            <div className="temp">
+                                {data
+                                    ? `${Math.round(data.temperature)}°`
+                                    : '--'}
+                            </div>
 
-                    <div className="humidity">
-
-                        <div className="data-name">
-                            Humidity
                         </div>
 
-                        <i className="fa-solid fa-droplet"></i>
+                        <div className="weather-date">
 
-                        <div className="data">
-                            {data
-                                ? `${data.humidity}%`
-                                : '--'}
+                            <p>
+                                {data
+                                    ? formatDate(data.time)
+                                    : ''}
+                            </p>
+
                         </div>
 
-                    </div>
+                        <div className="weather-data">
 
-                    <div className="wind">
+                            <div className="humidity">
 
-                        <div className="data-name">
-                            Wind
+                                <div className="data-name">
+                                    Humidity
+                                </div>
+
+                                <i className="fa-solid fa-droplet"></i>
+
+                                <div className="data">
+                                    {data
+                                        ? `${data.humidity}%`
+                                        : '--'}
+                                </div>
+
+                            </div>
+
+                            <div className="wind">
+
+                                <div className="data-name">
+                                    Wind
+                                </div>
+
+                                <i className="fa-solid fa-wind"></i>
+
+                                <div className="data">
+                                    {data
+                                        ? `${data.windSpeed} km/h`
+                                        : '--'}
+                                </div>
+
+                            </div>
+
                         </div>
 
-                        <i className="fa-solid fa-wind"></i>
+                    </>
 
-                        <div className="data">
-                            {data
-                                ? `${data.windSpeed} km/h`
-                                : '--'}
-                        </div>
-
-                    </div>
-
-                </div>
+                )}
 
             </div>
 
