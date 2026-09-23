@@ -9,6 +9,7 @@ const WheatherApp = () => {
     const [data, setData] = useState(null)
     const [location, setLocation] = useState('')
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const weatherImages = {
         sunny,
@@ -25,7 +26,7 @@ const WheatherApp = () => {
         const result = await response.json()
 
         if (!result.results || result.results.length === 0) {
-            throw new Error('Cidade não encontrada')
+            return null
         }
 
         const city = result.results[0]
@@ -64,16 +65,21 @@ const WheatherApp = () => {
         const normalizedCity = city.trim()
 
         if (!normalizedCity) {
+            setError('Enter a city name')
+            setData(null)
             return
         }
 
         try {
 
             setLoading(true)
+            setError('')
 
             const coordinates = await getCoordinates(normalizedCity)
 
             if (!coordinates) {
+                setError('City not found')
+                setData(null)
                 return
             }
 
@@ -92,9 +98,13 @@ const WheatherApp = () => {
                 time: currentWeather.time
             })
 
-        } catch (error) {
+            setLocation('')
 
-            console.error(error)
+        } catch (err) {
+
+            console.error(err)
+            setError('Unable to load weather data')
+            setData(null)
 
         } finally {
 
@@ -239,7 +249,13 @@ const WheatherApp = () => {
                         Loading...
                     </div>
 
-                ) : (
+                ) : error ? (
+
+                    <div className="not-found">
+                        {error}
+                    </div>
+
+                ) : data ? (
 
                     <>
 
@@ -251,15 +267,11 @@ const WheatherApp = () => {
                             />
 
                             <div className="weather-type">
-                                {weatherInfo
-                                    ? weatherInfo.description
-                                    : '--'}
+                                {weatherInfo.description}
                             </div>
 
                             <div className="temp">
-                                {data
-                                    ? `${Math.round(data.temperature)}°`
-                                    : '--'}
+                                {`${Math.round(data.temperature)}°`}
                             </div>
 
                         </div>
@@ -267,9 +279,7 @@ const WheatherApp = () => {
                         <div className="weather-date">
 
                             <p>
-                                {data
-                                    ? formatDate(data.time)
-                                    : ''}
+                                {formatDate(data.time)}
                             </p>
 
                         </div>
@@ -285,9 +295,7 @@ const WheatherApp = () => {
                                 <i className="fa-solid fa-droplet"></i>
 
                                 <div className="data">
-                                    {data
-                                        ? `${data.humidity}%`
-                                        : '--'}
+                                    {`${data.humidity}%`}
                                 </div>
 
                             </div>
@@ -301,9 +309,7 @@ const WheatherApp = () => {
                                 <i className="fa-solid fa-wind"></i>
 
                                 <div className="data">
-                                    {data
-                                        ? `${data.windSpeed} km/h`
-                                        : '--'}
+                                    {`${data.windSpeed} km/h`}
                                 </div>
 
                             </div>
@@ -312,7 +318,7 @@ const WheatherApp = () => {
 
                     </>
 
-                )}
+                ) : null}
 
             </div>
 
